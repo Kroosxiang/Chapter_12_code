@@ -5,7 +5,12 @@ fn main() {
 
     //V1: let (query , file_path) = parse_config(&args);
     //V2: let config = parse_config(&args);
-    let config = Config::new(&args);
+    let config = Config::new(&args).unwarp_or_else(
+        |err|{
+            println!("Problem parsing argument: {err}"):
+            process::exit(1);
+        }
+    );
 
     // println!("We are reading {query}");
     println!("We are reading {}", config.query);
@@ -23,11 +28,15 @@ struct Config{
 }
 
 impl Config{
-    fn new(args : &[String]) -> Config {
+    fn new(args : &[String]) -> Result<config , &'static str>{
+        if args.len() < 3{ 
+            panic!("Not Enough arguments");
+        }
+
         let query = args[1].clone();
         let file_path = args[2].clone();
 
-        Config {query: query.to_string(),file_path : file_path.to_string()}
+        Ok(Config {query: query.to_string(),file_path : file_path.to_string()})
     }
 }
 
