@@ -1,18 +1,19 @@
-use std::{env, fs, process};
-use std::result::Result;
-use std::error::Error;
+use std::env;
+use std::process;
+
+use minigrep::Config;
+
 
 fn main() {
     let args : Vec<String> = env::args().collect();
 
     //V1: let (query , file_path) = parse_config(&args);
     //V2: let config = parse_config(&args);
-    let config = Config::new(&args).unwrap_or_else(
+    let config = Config::build(&args).unwrap_or_else(
         |err|{
             println!("Problem parsing argument: {err}");
             process::exit(1);
-        }
-    );
+    });
 
     // println!("We are reading {query}");
     // println!("From this file path {file_path}");
@@ -21,36 +22,10 @@ fn main() {
 
     // let contents = fs::read_to_string(config.file_path).expect("Should have been able to read the file");
     // println!("With text:\n{contents}");
-    if let Err(e) = run(config){
+    if let Err(e) = minigrep::run(config){
         println!("Application  error : {e}");
         process::exit(1);
     }
-}
-
-struct Config{
-    query     : String,
-    file_path : String,
-}
-
-impl Config{
-    fn new(args : &[String]) -> Result<Config , &'static str>{
-        if args.len() < 3{ 
-            return Err("Not Enough arguments");
-        }
-
-        let query     = args[1].clone();
-        let file_path = args[2].clone();
-
-        Ok(Config {query: query.to_string(),file_path : file_path.to_string()})
-    }
-} 
-
-fn run(config : Config) -> Result<() , Box<dyn Error>> {
-    let contents = fs::read_to_string(config.file_path).expect("Should have been able to read the file");
-
-    println!("With text : {contents}");
-
-    Ok(())
 }
 
 /* fn parse_config(args : &[String]) -> Config{  //(&str , &str)
