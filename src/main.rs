@@ -1,4 +1,4 @@
-use std::{env, fs,process};
+use std::{env, fs, process};
 use std::result::Result;
 use std::error::Error;
 
@@ -15,20 +15,22 @@ fn main() {
     );
 
     // println!("We are reading {query}");
-    println!("We are reading {}", config.query);
     // println!("From this file path {file_path}");
+    println!("We are reading {}", config.query);
     println!("File path {}", config.file_path);
 
     // let contents = fs::read_to_string(config.file_path).expect("Should have been able to read the file");
     // println!("With text:\n{contents}");
-    run(config); 
+    if let Err(e) = run(config){
+        println!("Application  error : {e}");
+        process::exit(1);
+    }
 }
 
 struct Config{
-    query : String,
-    file_path :String,
+    query     : String,
+    file_path : String,
 }
-
 
 impl Config{
     fn new(args : &[String]) -> Result<Config , &'static str>{
@@ -36,12 +38,12 @@ impl Config{
             return Err("Not Enough arguments");
         }
 
-        let query = args[1].clone();
+        let query     = args[1].clone();
         let file_path = args[2].clone();
 
         Ok(Config {query: query.to_string(),file_path : file_path.to_string()})
     }
-}
+} 
 
 fn run(config : Config) -> Result<() , Box<dyn Error>> {
     let contents = fs::read_to_string(config.file_path).expect("Should have been able to read the file");
@@ -50,6 +52,7 @@ fn run(config : Config) -> Result<() , Box<dyn Error>> {
 
     Ok(())
 }
+
 /* fn parse_config(args : &[String]) -> Config{  //(&str , &str)
     // let query = &args[1];
     let query = &args[1].clone(); //hard copy
